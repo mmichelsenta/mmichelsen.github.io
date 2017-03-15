@@ -32,38 +32,52 @@ function setup() {
     secret = 0;
     lives = 3;
     invincibility = 0;
+    player.a_speed = 0;
 }
 
 function draw() {
     switch(gameMode) {
     case "play":
         background(backgroundImage);
-        if(enemy.overlap(player)) {
-            gameOver();
-        }
-        
-        if(keyDown(RIGHT_ARROW) && player.position.x < width-(playerImage.width/2)) {
+        if(keyDown(RIGHT_ARROW)) {
             player.position.x += 3+score/5;
         }
-        if(keyDown(LEFT_ARROW) && player.position.x > (playerImage.width/2)) {
+        if (player.position.x > width-(playerImage.width/2)) {
+            player.position.x = width-(playerImage.width/2);
+        }
+        
+        if(keyDown(LEFT_ARROW)) {
             player.position.x += -3-score/5;
         }
+        if (player.position.x < (playerImage.width/2)) {
+            player.position.x = (playerImage.width/2);
+        }
+        
         
         enemy.position.y += enemy.a_speed;
         enemy.position.x += enemy.a_angle;
         enemy.a_speed += 0.1;
-        if(enemy.position.x < (enemyImage.width/2) || enemy.position.x > width - (enemyImage.width/2)) {
-            enemy.a_angle *= -1;
+        if (enemy.position.x < (enemyImage.width/2)) {
+            enemy.a_angle = Math.abs(enemy.a_angle);
             enemy.rotationSpeed = random(-6.0, 6.0);
+            enemy.position.x = (enemyImage.width/2);
         }
-        if(enemy.position.y > height - (enemyImage.height/2)) {
+        if (enemy.position.x > width - (enemyImage.width/2)) {
+            enemy.a_angle = -Math.abs(enemy.a_angle);
+            enemy.rotationSpeed = random(-6.0, 6.0);
+            enemy.position.x = width - (enemyImage.width/2);
+        }
+        if (enemy.position.y > height - (enemyImage.height/2)) {
             enemy.a_speed = random(-9-score/10,-6-score/5);
-            enemy.a_angle = random(-2.0, 2.0) * (1+score/3);
+            enemy.a_angle = random(-1.5, 1.5) * (1+score/7);
             if (invincibility < 0) score++;
+            enemy.position.y = height - (enemyImage.height/2);
         }
-        if(enemy.position.y < (enemyImage.height/2)) {
-            enemy.a_speed = random(1+score/5,3+score/5);
-            enemy.a_angle = random(-2.0, 2.0) * (1+score/3);
+        if (enemy.position.y < (enemyImage.height/2)) {
+            //enemy.a_speed = random(1+score/5,3+score/5);
+            enemy.a_speed = 0.75 * Math.abs(enemy.a_speed);
+            //enemy.a_angle = random(-1.5, 1.5) * (1+score/7);
+            enemy.position.y = (enemyImage.height/2);
         }
         drawSprites();
         textAlign(LEFT);
@@ -75,6 +89,9 @@ function draw() {
                 player.position.y = -100;
             } else player.position.y = height-(playerImage.height/2)
         } else player.position.y = height-(playerImage.height/2)
+        if (enemy.overlap(player)) {
+            gameOver();
+        }
         break;
     case "over":
         break;
@@ -133,9 +150,9 @@ function mouseClicked() {
 
 function secretf() {
     if (secret == 10) {
-        score += 100;
-        lives = 30;
-        secret = 11;
+        lives = Math.ceil(score * 0.2);
+        score = Math.floor(score * 0.8);
+        secret = 0;
     }
     else {
         if (keyWentDown(UP_ARROW)) {
@@ -161,12 +178,6 @@ function secretf() {
         if (keyWentDown("a")) {
             if (secret == 9) secret++;
             else secret = 0;
-        }
-        if (keyWentDown(ENTER)) {
-            if (secret == 11) {
-                score = 0;
-                lives = 1;
-            }
         }
     }
 }
