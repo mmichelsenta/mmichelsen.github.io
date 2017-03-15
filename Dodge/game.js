@@ -150,7 +150,7 @@ function mouseClicked() {
 
 function secretf() {
     if (secret == 10) {
-        lives = Math.ceil(score * 0.2);
+        lives += Math.ceil(score * 0.2);
         score = Math.floor(score * 0.8);
         secret = 0;
     }
